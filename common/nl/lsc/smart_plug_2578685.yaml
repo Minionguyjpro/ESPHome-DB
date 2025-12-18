@@ -74,7 +74,7 @@ light:
     name: "Blauwe LED"
     icon: mdi:led-on
 
-    output:
+output:
   - platform: libretiny_pwm
     pin: P26
     id: blue_led_pwm
