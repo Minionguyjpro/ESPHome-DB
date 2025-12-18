@@ -1,3 +1,6 @@
+packages:
+  common: !include ../generic.yaml
+
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
