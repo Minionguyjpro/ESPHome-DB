@@ -1,0 +1,137 @@
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  on_boot:
+    priority: -50
+    then:
+      - lambda: |-
+          if (id(boot_mode_value) == "Aan") {
+           id(relay).turn_on();
+          } else if (id(boot_mode_value) == "Uit") {
+            id(relay).turn_off();
+          }
+          // "Laatste status onthouden" → do nothing, ESPHome restores last state automatically
+      - lambda: |-
+          id(boot_mode).publish_state(id(boot_mode_value));
+
+bk72xx:
+  board: generic-bk7231t-qfn32-tuya
+
+logger:
+
+globals:
+  - id: boot_mode_value
+    type: std::string
+    restore_value: true
+    initial_value: '"Laatste status onthouden"'
+
+  - id: saved_state_value
+    type: std::string
+    restore_value: true
+    initial_value: '"Uit"'
+
+light:
+  - platform: status_led
+    id: red_status_led
+    pin:
+      number: P6
+      inverted: false
+    name: "Rode status-LED"
+    icon: mdi:led-off
+
+  - platform: monochromatic
+    id: blue_led
+    output: blue_led_pwm
+    effects:
+      - pulse:
+          name: "Puls"
+      - pulse:
+          name: "Snelle puls"
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Langzame puls"
+          transition_length: 500ms
+          update_interval: 2s
+      - pulse:
+          name: "Asymmetrische puls"
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s
+      - lambda:
+          name: "Slaapmodus"
+          update_interval: 50ms
+          lambda: |-
+            static float brightness = 0.05;
+            static int direction = 1;
+            id(blue_led_pwm).set_level(brightness);
+            brightness += direction * 0.002;
+            if (brightness >= 0.3) direction = -1;
+            if (brightness <= 0.05) direction = 1;
+    name: "Blauwe LED"
+    icon: mdi:led-on
+
+    output:
+  - platform: libretiny_pwm
+    pin: P26
+    id: blue_led_pwm
+    inverted: false
+    frequency: 1000 Hz
+
+select:
+  - platform: template
+    id: boot_mode
+    name: "Opstartgedrag"
+    icon: mdi:power-settings
+    entity_category: config
+    restore_value: true
+    optimistic: true
+    options:
+      - "Laatste status onthouden"
+      - "Aan"
+      - "Uit"
+    set_action:
+      - lambda: |-
+          ESP_LOGI("boot_mode", "Boot mode changed to: %s", x.c_str());
+          id(boot_mode_value) = x;
+
+switch:
+  - platform: gpio
+    pin: P8
+    id: relay
+    name: None
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - light.turn_on: blue_led
+      - lambda: |-
+          id(saved_state_value) = "Aan";
+    on_turn_off:
+      - light.turn_off: blue_led
+      - lambda: |-
+          id(saved_state_value) = "Uit";
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO7
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Aan/Uit-knop"
+    entity_category: diagnostic
+    on_press:
+      then:
+        - switch.toggle: relay
+
+sensor:
+  - platform: internal_temperature
+    name: "Interne temperatuur"
+    update_interval: 5s
+    filters:
+      - lambda: return x + 10.0;
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    entity_category: diagnostic
