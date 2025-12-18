@@ -1,0 +1,283 @@
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+esp8266:
+  board: esp01_1m
+
+logger:
+  baud_rate: 0
+
+globals:
+  - id: overcurrent_alert
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+light:
+  - platform: rgb
+    id: led
+    name: "LED"
+    red: led_red
+    green: led_green
+    blue: led_green
+    default_transition_length: 0.5s
+    gamma_correct: 2.0
+    effects:
+      - pulse:
+          name: "Puls"
+      - pulse:
+          name: "Snelle puls"
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Langzame puls"
+          transition_length: 500ms
+          update_interval: 2s
+      - pulse:
+          name: "Asymmetrische puls"
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s
+      - lambda:
+          name: "Slaapmodus"
+          update_interval: 50ms
+          lambda: |-
+            static float brightness = 0.05;
+            static int direction = 1;
+            id(led_green).set_level(brightness);
+            brightness += direction * 0.002;
+            if (brightness >= 0.3) direction = -1;
+            if (brightness <= 0.05) direction = 1;
+      - lambda:
+          name: "Rickroll"
+          update_interval: 20ms  # smaller interval for smoother fade
+          lambda: |-
+            // --- Configuration ---
+            const int beat_count = 17;
+            const int beat_times[beat_count] = {
+              0, 500, 1000, 1500, 2200, 2900, 3400, 3900, 4400, 4900,
+              5600, 6100, 6600, 7100, 7600, 8100, 8600
+            };
+            const int beat_durations[beat_count] = {
+              400, 400, 400, 400, 400, 400, 400, 400, 400, 500,
+              400, 400, 400, 400, 400, 500, 500
+            };
+
+            const float min_brightness = 0.05;
+            const float max_brightness = 0.9;
+
+            // --- State ---
+            static unsigned long start_time = millis();
+            unsigned long now = millis() - start_time;
+
+            // Total duration
+            const unsigned long total_duration = 9100;  // ms
+
+            // Restart loop
+            if (now >= total_duration) {
+              start_time = millis();
+              now = 0;
+            }
+
+            // Determine which beat we're in
+            int i;
+            for (i = 0; i < beat_count; i++) {
+              if (now >= beat_times[i] && now < beat_times[i] + beat_durations[i])
+                break;
+            }
+
+            float brightness = min_brightness;
+
+            if (i < beat_count) {
+              // Time within current beat
+              unsigned long beat_progress = now - beat_times[i];
+              float progress = (float)beat_progress / beat_durations[i];
+              // Smooth fade in/out
+              brightness = min_brightness + (max_brightness - min_brightness) * sin(progress * 3.14159);
+            }
+
+            // Apply PWM brightness
+            id(led_green).set_level(brightness);
+      - lambda:
+          name: "Bliksemflits"
+          update_interval: 10ms
+          lambda: |-
+            static float brightness = 0.0;
+            if (random_float() < 0.02) brightness = 1.0;  // Random flash
+            brightness *= 0.9;  // Fade out
+            id(led_green).set_level(brightness);
+
+output:
+  - platform: esp8266_pwm
+    id: led_green
+    pin: GPIO12    # Green channel / single LED control
+    inverted: true
+    frequency: 1000 Hz
+    max_power: 100%
+  
+  - platform: esp8266_pwm
+    id: led_red
+    pin: GPIO4    # Red channel / single LED control 
+    inverted: true
+    frequency: 1000 Hz
+    max_power: 100%
+
+number:
+  - platform: template
+    name: "Stroombeveiliging"
+    id: current_limit
+    optimistic: true
+    restore_value: true
+    min_value: 0.1
+    max_value: 16.0
+    step: 0.1
+    unit_of_measurement: "A"
+    initial_value: 10.0
+    mode: box  # or slider
+    entity_category: config
+
+interval:
+  - interval: 1s
+    then:
+      - lambda: |-
+          float limit = id(current_limit).state;
+          float current = id(power_monitoring_current).state;
+
+          static int overcurrent_count = 0;
+
+          if (current > limit && limit > 0) {
+            overcurrent_count++;
+          } else {
+            overcurrent_count = 0;
+          }
+
+          if (overcurrent_count >= 3) {
+            ESP_LOGW("overcurrent", "Overcurrent: %.2fA > %.2fA", current, limit);
+            id(relay).turn_off();
+            id(overcurrent_alert) = true;  // trigger red LED
+          } else if (overcurrent_count == 0) {
+            id(overcurrent_alert) = false;  // restore LED
+          }
+
+      - if:
+          condition:
+            lambda: 'return id(overcurrent_alert);'
+          then:
+            - light.turn_on:
+                id: led
+                red: 100%
+                green: 0%
+                blue: 0%
+
+switch:
+  - platform: gpio
+    pin: GPIO13
+    id: relay
+    name: None
+    restore_mode: RESTORE_DEFAULT_ON
+
+uart:
+  rx_pin: GPIO03
+  baud_rate: 4800
+  parity: EVEN
+  id: power_monitoring
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Aan/Uit-knop"
+    entity_category: diagnostic
+    on_press:
+      then:
+        - switch.toggle: relay
+  
+  - platform: template
+    name: "Stopcontact"
+    device_class: plug
+    lambda: |-
+      if (id(power_monitoring_current).state > 0) {
+        return true;  // Device is plugged in
+      } else {
+        return false;  // Device is not plugged in
+      }
+
+sensor:
+  - platform: cse7766
+    uart_id: power_monitoring
+    voltage:
+      name: "Spanning"
+      icon: mdi:sine-wave
+      unit_of_measurement: "V"
+      device_class: voltage
+      state_class: measurement
+      filters:
+        - skip_initial: 3
+        - throttle_average: 10s
+        - calibrate_linear:
+            - 0.0 -> 0.0
+            - 122.9 -> 232.6
+    current:
+      name: "Stroom"
+      id: power_monitoring_current
+      icon: mdi:current-ac
+      unit_of_measurement: "A"
+      device_class: current
+      state_class: measurement
+      filters:
+        - throttle_average: 10s
+    power:
+      name: "Vermogen"
+      icon: mdi:flash-outline
+      unit_of_measurement: "W"
+      device_class: power
+      state_class: measurement
+      id: power
+      filters:
+        - skip_initial: 3
+        - throttle_average: 10s
+        - calibrate_linear:
+          - 0.0 -> 0.0
+          - 8.8 -> 16.8
+        - lambda: |-
+            if (x < 0.0 && x > -0.2) return 0.0;
+            return x;
+
+  - platform: integration
+    name: "Energie"
+    sensor: power
+    time_unit: h
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    filters:
+      - multiply: 0.001  # Converts W·h → kWh
+
+  - platform: adc
+    pin: GPIO17
+    name: "Interne temperatuur"
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: 5min
+    filters:
+      - calibrate_linear:
+          - 0.15 -> 18.6
+          - 0.16 -> 19.8
+
+  - platform: integration
+    name: "Verbruik deze maand"
+    sensor: power
+    time_unit: h
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    filters:
+      - multiply: 0.001   # Wh → kWh
