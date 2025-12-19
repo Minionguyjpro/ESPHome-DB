@@ -38,7 +38,7 @@ web_server:
     username: !secret web_server_username
     password: !secret web_server_password
   include_internal: false
-  local: true
+  local: ${local}
   log: true
   version: 3
 
