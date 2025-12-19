@@ -1,3 +1,6 @@
+substitutions:
+  local: false
+
 packages:
   common: !include ../generic.yaml
 
