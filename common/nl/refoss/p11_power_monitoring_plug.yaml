@@ -147,11 +147,11 @@ number:
     entity_category: config
 
 interval:
-  - interval: 1s
+  - interval: 100ms
     then:
       - lambda: |-
           float limit = id(current_limit).state;
-          float current = id(power_monitoring_current).state;
+          float current = id(current_raw).state;
 
           static int overcurrent_count = 0;
 
@@ -208,7 +208,7 @@ binary_sensor:
     name: "Stopcontact"
     device_class: plug
     lambda: |-
-      if (id(power_monitoring_current).state > 0) {
+      if (id(current).state > 0) {
         return true;  // Device is plugged in
       } else {
         return false;  // Device is not plugged in
@@ -230,14 +230,8 @@ sensor:
             - 0.0 -> 0.0
             - 122.9 -> 232.6
     current:
-      name: "Stroom"
-      id: power_monitoring_current
-      icon: mdi:current-ac
-      unit_of_measurement: "A"
-      device_class: current
-      state_class: measurement
-      filters:
-        - throttle_average: 10s
+      id: current_raw
+      internal: true
     power:
       name: "Vermogen"
       icon: mdi:flash-outline
@@ -254,6 +248,17 @@ sensor:
         - lambda: |-
             if (x < 0.0 && x > -0.2) return 0.0;
             return x;
+
+  - platform: template
+    name: "Stroom"
+    icon: mdi:current-ac
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+    id: current
+    update_interval: 10s
+    lambda: |-
+      return id(current_raw).state;
 
   - platform: integration
     name: "Energie"
