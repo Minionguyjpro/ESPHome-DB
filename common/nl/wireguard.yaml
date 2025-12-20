@@ -31,6 +31,7 @@ binary_sensor:
       name: 'WireGuard ingeschakeld'
       id: wireguard_enabled
 
+text_sensor:
   - platform: wireguard
     status:
       name: 'WireGuard-status'
