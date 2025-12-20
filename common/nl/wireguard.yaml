@@ -1,0 +1,38 @@
+wireguard:
+  address: ${wg_address}
+  private_key: ${wg_private_key}
+  peer_endpoint: ${wg_peer_endpoint}
+  peer_public_key: ${wg_peer_public_key}
+  peer_preshared_key: ${wg_peer_preshared_key}
+  netmask: ${wg_netmask}
+  reboot_timeout: ${wg_reboot_timeout}
+
+switch:
+  - platform: template
+    id: vpn_relay
+    name: "VPN-verbinding"
+    icon: mdi:key
+    optimistic: false
+    entity_category: config
+    turn_on_action:
+      - wireguard.enable
+    turn_off_action:
+      - wireguard.disable
+    lambda: |-
+      if (id(wireguard_enabled).state) {
+        return true;
+      } else {
+        return false;
+      };
+
+binary_sensor:
+  - platform: wireguard
+    enabled:
+      name: 'WireGuard ingeschakeld'
+      id: wireguard_enabled
+
+  - platform: wireguard
+    status:
+      name: 'WireGuard-status'
+      icon: mdi:vpn
+      entity_category: diagnostic
