@@ -1,3 +1,12 @@
+esphome:
+  on_boot:
+    then:
+      - if:
+          condition:
+            lambda: return ${wg_auto_enable} == "true";
+          then:
+            - switch.turn_on: vpn_relay
+
 wireguard:
   address: ${wg_address}
   private_key: ${wg_private_key}
