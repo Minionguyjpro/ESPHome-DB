@@ -221,7 +221,7 @@ binary_sensor:
     name: "Stopcontact"
     device_class: plug
     lambda: |-
-      if (id(current).state > 0) {
+      if (id(power).state > 0) {
         return true;  // Device is plugged in
       } else {
         return false;  // Device is not plugged in
