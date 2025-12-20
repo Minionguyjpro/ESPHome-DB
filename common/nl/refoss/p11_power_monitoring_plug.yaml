@@ -26,7 +26,7 @@ light:
     name: "LED"
     red: led_red
     green: led_green
-    blue: led_green
+    blue: led_red
     default_transition_length: 0.5s
     gamma_correct: 2.0
     effects:
@@ -116,6 +116,21 @@ light:
             if (random_float() < 0.02) brightness = 1.0;  // Random flash
             brightness *= 0.9;  // Fade out
             id(led_green).set_level(brightness);
+      - lambda:
+          name: "Waarschuwing"
+          internal: true
+          update_interval: 100ms
+          lambda: |-
+            static bool state = false;
+            state = !state;
+
+            if (state) {
+              id(led_red).set_level(1.0);
+              id(led_green).set_level(0.0);
+            } else {
+              id(led_red).set_level(0.0);
+              id(led_green).set_level(0.0);
+            }
 
 output:
   - platform: esp8266_pwm
@@ -175,9 +190,7 @@ interval:
           then:
             - light.turn_on:
                 id: led
-                red: 100%
-                green: 0%
-                blue: 0%
+                effect: "Waarschuwing"
 
 switch:
   - platform: gpio
