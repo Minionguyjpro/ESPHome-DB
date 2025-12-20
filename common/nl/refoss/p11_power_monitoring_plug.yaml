@@ -118,7 +118,6 @@ light:
             id(led_green).set_level(brightness);
       - lambda:
           name: "Waarschuwing"
-          internal: true
           update_interval: 100ms
           lambda: |-
             static bool state = false;
