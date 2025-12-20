@@ -4,7 +4,7 @@ esphome:
     then:
       - if:
           condition:
-            lambda: return ${wg_auto_enable} == "true";
+            lambda: return ${wg_auto_enable};
           then:
             - switch.turn_on: vpn_relay
 
