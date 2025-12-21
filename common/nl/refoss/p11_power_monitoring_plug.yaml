@@ -20,6 +20,11 @@ globals:
     restore_value: false
     initial_value: 'false'
 
+  - id: previous_led_effect
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+
 light:
   - platform: rgb
     id: led
@@ -175,12 +180,18 @@ interval:
             overcurrent_count = 0;
           }
 
-          if (overcurrent_count >= 3) {
+          if (overcurrent_count >= 3 && !id(overcurrent_alert)) {
             ESP_LOGW("overcurrent", "Overcurrent: %.2fA > %.2fA", current, limit);
+
+            // Save current LED effect
+            if (id(led).get_effect_name().has_value()) {
+              id(previous_led_effect) = id(led).get_effect_name().value();
+            } else {
+              id(previous_led_effect) = "";
+            }
+
             id(relay).turn_off();
-            id(overcurrent_alert) = true;  // trigger red LED
-          } else if (overcurrent_count == 0) {
-            id(overcurrent_alert) = false;  // restore LED
+            id(overcurrent_alert) = true;
           }
 
       - if:
@@ -197,6 +208,18 @@ switch:
     id: relay
     name: None
     restore_mode: RESTORE_DEFAULT_ON
+    on_turn_on:
+      then:
+        - lambda: |-
+            id(overcurrent_alert) = false;
+
+            if (!id(previous_led_effect).empty()) {
+              auto call = id(led).turn_on();
+              call.set_effect(id(previous_led_effect).c_str());
+              call.perform();
+            } else {
+              id(led).turn_on();
+            }
 
 uart:
   rx_pin: GPIO03
