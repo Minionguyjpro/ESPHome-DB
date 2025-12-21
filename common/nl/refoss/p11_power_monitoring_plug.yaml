@@ -184,8 +184,9 @@ interval:
             ESP_LOGW("overcurrent", "Overcurrent: %.2fA > %.2fA", current, limit);
 
             // Save current LED effect
-            if (id(led).get_effect_name().has_value()) {
-              id(previous_led_effect) = id(led).get_effect_name().value();
+            std::string effect_name = id(led).get_effect_name();
+            if (!effect_name.empty()) {
+              id(previous_led_effect) = effect_name;
             } else {
               id(previous_led_effect) = "";
             }
