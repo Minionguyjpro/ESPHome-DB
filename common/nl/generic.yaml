@@ -17,6 +17,8 @@ wifi:
 
 captive_portal:
 
+debug:
+
 # Enable OTA
 ota:
   platform: esphome
