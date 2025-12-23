@@ -92,6 +92,12 @@ sensor:
               ).c_str();
 
 text_sensor:
+  - platform: debug
+    reset_reason:
+      name: "Herstartreden"
+      icon: mdi:information
+      entity_category: diagnostic
+  
   - platform: wifi_info
     dns_address:
       name: "DNS-adres"
