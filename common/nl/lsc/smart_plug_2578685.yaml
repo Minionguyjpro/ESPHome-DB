@@ -3,6 +3,7 @@ substitutions:
 
 packages:
   common: !include ../generic.yaml
+  libretiny: !include ../libretiny.yaml
 
 esphome:
   name: ${device_name}
