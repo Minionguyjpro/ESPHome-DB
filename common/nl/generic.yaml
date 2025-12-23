@@ -93,13 +93,13 @@ sensor:
 
 text_sensor:
   - platform: wifi_info
-    ip_address:
-      name: "IP-adres"
-      icon: mdi:ip
-      entity_category: diagnostic
     dns_address:
       name: "DNS-adres"
       icon: mdi:dns
+      entity_category: diagnostic
+    ip_address:
+      name: "IP-adres"
+      icon: mdi:ip
       entity_category: diagnostic
     ssid:
       name: "SSID"
