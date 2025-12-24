@@ -136,6 +136,7 @@ sensor:
   - platform: internal_temperature
     name: "Interne temperatuur"
     update_interval: 5s
+    accuracy_decimals: 2
     filters:
       - lambda: return x + 10.0;
     unit_of_measurement: "°C"
