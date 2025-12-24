@@ -134,3 +134,7 @@ button:
         - switch.turn_off: relay
         - delay: 2s
         - switch.turn_on: relay
+
+  - platform: safe_mode
+    name: "Herstarten (veilige modus)"
+    entity_category: diagnostic
