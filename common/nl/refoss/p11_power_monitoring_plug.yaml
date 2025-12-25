@@ -264,6 +264,7 @@ binary_sensor:
           - delay: 500ms
           - lambda: |-
               id(double_press_detected) = false;
+  
   - platform: template
     name: "Dubbele druk gedetecteerd"
     lambda: |-
