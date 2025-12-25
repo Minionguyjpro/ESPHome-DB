@@ -15,6 +15,11 @@ logger:
   baud_rate: 0
 
 globals:
+  - id: double_press_detected
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
   - id: overcurrent_alert
     type: bool
     restore_value: false
@@ -236,9 +241,33 @@ binary_sensor:
       inverted: true
     name: "Aan/Uit-knop"
     entity_category: diagnostic
-    on_press:
-      then:
-        - switch.toggle: relay
+    on_multi_click:
+      - timing:
+          - ON for 50ms to 400ms
+          - OFF for at least 300ms
+        then:
+          - switch.toggle: relay
+
+      - timing:
+          - ON for at least 2s
+        then:
+          - light.toggle: led
+
+      - timing:
+          - ON for 50ms to 400ms
+          - OFF for 50ms to 300ms
+          - ON for 50ms to 400ms
+          - OFF for at least 300ms
+        then:
+          - lambda: |-
+              id(double_press_detected) = true;
+          - delay: 500ms
+          - lambda: |-
+              id(double_press_detected) = false;
+  - platform: template
+    name: "Dubbele druk gedetecteerd"
+    lambda: |-
+      return id(double_press_detected);
   
   - platform: template
     name: "Stopcontact"
