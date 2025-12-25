@@ -20,6 +20,11 @@ globals:
     restore_value: false
     initial_value: 'false'
 
+  - id: long_double_press_detected
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
   - id: overcurrent_alert
     type: bool
     restore_value: false
@@ -243,10 +248,14 @@ binary_sensor:
     entity_category: diagnostic
     on_multi_click:
       - timing:
-          - ON for 50ms to 400ms
-          - OFF for at least 300ms
+          - ON for 30ms to 300ms
+          - OFF for at least 150ms
         then:
-          - switch.toggle: relay
+          - if:
+              condition:
+                lambda: 'return !id(overcurrent_alert);'
+              then:
+                - switch.toggle: relay
 
       - timing:
           - ON for at least 2s
@@ -254,21 +263,71 @@ binary_sensor:
           - light.toggle: led
 
       - timing:
-          - ON for 50ms to 400ms
-          - OFF for 50ms to 300ms
-          - ON for 50ms to 400ms
+          - ON for 50ms to 250ms
+          - OFF for 50ms to 200ms
+          - ON for 50ms to 250ms
           - OFF for at least 300ms
         then:
+          - logger.log: "Double press detected"
           - lambda: |-
               id(double_press_detected) = true;
           - delay: 500ms
           - lambda: |-
               id(double_press_detected) = false;
+
+      - timing:
+          - ON for 50ms to 250ms
+          - OFF for 50ms to 200ms
+          - ON for 50ms to 250ms
+          - OFF for 50ms to 200ms
+          - ON for 50ms to 250ms
+          - OFF for at least 300ms
+        then:
+          - logger.log: "Triple press detected"
+          - lambda: |-
+              std::string current = id(led).get_effect_name();
+
+              if (current != "Bliksemflits") {
+                if (!current.empty()) {
+                  id(previous_led_effect) = current;
+                } else {
+                  id(previous_led_effect) = "";
+                }
+
+                auto call = id(led).turn_on();
+                call.set_effect("Bliksemflits");
+                call.perform();
+              } else {
+                if (!id(previous_led_effect).empty()) {
+                  auto call = id(led).turn_on();
+                  call.set_effect(id(previous_led_effect).c_str());
+                  call.perform();
+                } else {
+                  id(led).turn_off();
+                }
+              }
+
+      - timing:
+          - ON for at least 2s
+          - OFF for 200ms to 2s
+          - ON for at least 2s
+        then:
+          - logger.log: "Long double press detected"
+          - lambda: |-
+              id(long_double_press_detected) = true;
+          - delay: 500ms
+          - lambda: |-
+              id(long_double_press_detected) = false;
   
   - platform: template
     name: "Dubbele druk gedetecteerd"
     lambda: |-
       return id(double_press_detected);
+
+  - platform: template
+    name: "Lange dubbele druk gedetecteerd"
+    lambda: |-
+      return id(long_double_press_detected);
   
   - platform: template
     name: "Stopcontact"
