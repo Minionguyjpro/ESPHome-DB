@@ -6,6 +6,11 @@ To use in your own project, only specify something like the following inside you
 packages:
   device:
     url: !secret repo_url
-    files: [common/nl/lsc/smart_plug_2578685.yaml, common/nl/wireguard.yaml]
+    files: [common/nl/lsc/smart_plug_2578685.yaml]
     refresh: 1h
+
+substitutions:
+  device_name: aquariumlamp
+  friendly_name: Aquariumlamp
+  static_ip: 192.168.1.105
 ```
