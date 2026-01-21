@@ -1,28 +1,5 @@
-safe_mode:
-  boot_is_good_after: 1min
-  reboot_timeout: 5min
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  manual_ip:
-    static_ip: ${static_ip}
-    gateway: !secret gateway_ip
-    subnet: !secret subnet_mask
-    dns1: !secret dns1
-    dns2: !secret dns2
-  ap:
-    ssid: "${friendly_name} Fallback Hotspot"
-    password: !secret ap_password
-
-captive_portal:
-
-debug:
-
-# Enable OTA
-ota:
-  platform: esphome
-  password: !secret ota_password
+packages:
+  common: !include ../base.yaml
 
 time:
   - platform: sntp
@@ -32,22 +9,6 @@ time:
       - 1.nl.pool.ntp.org
       - 2.nl.pool.ntp.org
     update_interval: 60s
-
-# Enable web server
-web_server:
-  port: 80
-  auth:
-    username: !secret web_server_username
-    password: !secret web_server_password
-  include_internal: false
-  local: ${local}
-  log: true
-  version: 3
-
-# Enable Home Assistant API
-api:
-  encryption:
-    key: !secret api_encryption_key
 
 # Diagnostics
 sensor:
