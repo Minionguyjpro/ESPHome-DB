@@ -67,7 +67,7 @@ light:
             on_length: 1s
             off_length: 500ms
           update_interval: 1.5s
-      - lambda:
+      - addressable_lambda:
           name: "Slaapmodus"
           update_interval: 50ms
           lambda: |-
@@ -80,7 +80,7 @@ light:
             brightness += direction * 0.002;
             if (brightness >= 0.3) direction = -1;
             if (brightness <= 0.05) direction = 1;
-      - lambda:
+      - addressable_lambda:
           name: "Rickroll"
           update_interval: 20ms  # smaller interval for smoother fade
           lambda: |-
@@ -127,7 +127,7 @@ light:
             
             // correct WS2812 output
             it[0] = Color(v, 0, 0);
-      - lambda:
+      - addressable_lambda:
           name: "Bliksemflits"
           update_interval: 10ms
           lambda: |-
@@ -140,7 +140,7 @@ light:
             
             uint8_t v = brightness * 255;
             it[0] = Color(v, v, v);
-      - lambda:
+      - addressable_lambda:
           name: "Waarschuwing"
           update_interval: 100ms
           lambda: |-
