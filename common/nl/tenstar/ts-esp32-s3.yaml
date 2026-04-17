@@ -1,0 +1,338 @@
+substitutions:
+  local: false
+
+packages:
+  common: !include ../generic.yaml
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: adafruit_feather_esp32s3_tft
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+logger:
+
+globals:
+  - id: double_press_detected
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+  - id: long_double_press_detected
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+  - id: overcurrent_alert
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+  - id: previous_led_effect
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+
+light:
+  - platform: rgb
+    id: led
+    name: "LED"
+    red: led_red
+    green: led_green
+    blue: led_red
+    default_transition_length: 0.5s
+    gamma_correct: 2.0
+    effects:
+      - pulse:
+          name: "Puls"
+      - pulse:
+          name: "Snelle puls"
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Langzame puls"
+          transition_length: 500ms
+          update_interval: 2s
+      - pulse:
+          name: "Asymmetrische puls"
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s
+      - lambda:
+          name: "Slaapmodus"
+          update_interval: 50ms
+          lambda: |-
+            static float brightness = 0.05;
+            static int direction = 1;
+            id(led_green).set_level(brightness);
+            brightness += direction * 0.002;
+            if (brightness >= 0.3) direction = -1;
+            if (brightness <= 0.05) direction = 1;
+      - lambda:
+          name: "Rickroll"
+          update_interval: 20ms  # smaller interval for smoother fade
+          lambda: |-
+            // --- Configuration ---
+            const int beat_count = 17;
+            const int beat_times[beat_count] = {
+              0, 500, 1000, 1500, 2200, 2900, 3400, 3900, 4400, 4900,
+              5600, 6100, 6600, 7100, 7600, 8100, 8600
+            };
+            const int beat_durations[beat_count] = {
+              400, 400, 400, 400, 400, 400, 400, 400, 400, 500,
+              400, 400, 400, 400, 400, 500, 500
+            };
+
+            const float min_brightness = 0.05;
+            const float max_brightness = 0.9;
+
+            // --- State ---
+            static unsigned long start_time = millis();
+            unsigned long now = millis() - start_time;
+
+            // Total duration
+            const unsigned long total_duration = 9100;  // ms
+
+            // Restart loop
+            if (now >= total_duration) {
+              start_time = millis();
+              now = 0;
+            }
+
+            // Determine which beat we're in
+            int i;
+            for (i = 0; i < beat_count; i++) {
+              if (now >= beat_times[i] && now < beat_times[i] + beat_durations[i])
+                break;
+            }
+
+            float brightness = min_brightness;
+
+            if (i < beat_count) {
+              // Time within current beat
+              unsigned long beat_progress = now - beat_times[i];
+              float progress = (float)beat_progress / beat_durations[i];
+              // Smooth fade in/out
+              brightness = min_brightness + (max_brightness - min_brightness) * sin(progress * 3.14159);
+            }
+
+            // Apply PWM brightness
+            id(led_green).set_level(brightness);
+      - lambda:
+          name: "Bliksemflits"
+          update_interval: 10ms
+          lambda: |-
+            static float brightness = 0.0;
+            if (random_float() < 0.02) brightness = 1.0;  // Random flash
+            brightness *= 0.9;  // Fade out
+            id(led_green).set_level(brightness);
+      - lambda:
+          name: "Waarschuwing"
+          update_interval: 100ms
+          lambda: |-
+            static bool state = false;
+            state = !state;
+
+            if (state) {
+              id(led_red).set_level(1.0);
+              id(led_green).set_level(0.0);
+            } else {
+              id(led_red).set_level(0.0);
+              id(led_green).set_level(0.0);
+            }
+
+output:
+  - platform: esp8266_pwm
+    id: led_red
+    pin: GPIO33    # Red channel / single LED control
+    inverted: true
+    frequency: 1000 Hz
+    max_power: 100%
+
+  - platform: esp8266_pwm
+    id: led_green
+    pin: GPIO33    # Green channel / single LED control
+    inverted: true
+    frequency: 1000 Hz
+    max_power: 100%
+
+  - platform: esp8266_pwm
+    id: led_blue
+    pin: GPIO33    # Green channel / single LED control
+    inverted: true
+    frequency: 1000 Hz
+    max_power: 100%
+
+interval:
+  - interval: 100ms
+    then:
+      - lambda: |-
+          float limit = id(current_limit).state;
+          float current = id(current_raw).state;
+
+          static int overcurrent_count = 0;
+
+          if (current > limit && limit > 0) {
+            overcurrent_count++;
+          } else {
+            overcurrent_count = 0;
+          }
+
+          if (overcurrent_count >= 3 && !id(overcurrent_alert)) {
+            ESP_LOGW("overcurrent", "Overcurrent: %.2fA > %.2fA", current, limit);
+
+            // Save current LED effect
+            std::string effect_name = id(led).get_effect_name();
+            if (!effect_name.empty()) {
+              id(previous_led_effect) = effect_name;
+            } else {
+              id(previous_led_effect) = "";
+            }
+
+            id(relay).turn_off();
+            id(overcurrent_alert) = true;
+          }
+
+      - if:
+          condition:
+            lambda: 'return id(overcurrent_alert);'
+          then:
+            - light.turn_on:
+                id: led
+                effect: "Waarschuwing"
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Aan/Uit-knop"
+    entity_category: diagnostic
+    on_multi_click:
+      - timing:
+          - ON for 30ms to 300ms
+          - OFF for at least 150ms
+        then:
+          - if:
+              condition:
+                lambda: 'return !id(overcurrent_alert);'
+              then:
+                - switch.toggle: relay
+
+      - timing:
+          - ON for at least 2s
+        then:
+          - light.toggle: led
+
+      - timing:
+          - ON for 50ms to 250ms
+          - OFF for 50ms to 200ms
+          - ON for 50ms to 250ms
+          - OFF for at least 300ms
+        then:
+          - logger.log: "Double press detected"
+          - lambda: |-
+              id(double_press_detected) = true;
+          - delay: 500ms
+          - lambda: |-
+              id(double_press_detected) = false;
+
+      - timing:
+          - ON for 50ms to 250ms
+          - OFF for 50ms to 200ms
+          - ON for 50ms to 250ms
+          - OFF for 50ms to 200ms
+          - ON for 50ms to 250ms
+          - OFF for at least 300ms
+        then:
+          - logger.log: "Triple press detected"
+          - lambda: |-
+              std::string current = id(led).get_effect_name();
+
+              if (current != "Bliksemflits") {
+                if (!current.empty()) {
+                  id(previous_led_effect) = current;
+                } else {
+                  id(previous_led_effect) = "";
+                }
+
+                auto call = id(led).turn_on();
+                call.set_effect("Bliksemflits");
+                call.perform();
+              } else {
+                if (!id(previous_led_effect).empty()) {
+                  auto call = id(led).turn_on();
+                  call.set_effect(id(previous_led_effect).c_str());
+                  call.perform();
+                } else {
+                  id(led).turn_off();
+                }
+              }
+
+      - timing:
+          - ON for at least 2s
+          - OFF for 200ms to 2s
+          - ON for at least 2s
+        then:
+          - logger.log: "Long double press detected"
+          - lambda: |-
+              id(long_double_press_detected) = true;
+          - delay: 500ms
+          - lambda: |-
+              id(long_double_press_detected) = false;
+
+  - platform: template
+    name: "Dubbele druk gedetecteerd"
+    lambda: |-
+      return id(double_press_detected);
+
+  - platform: template
+    name: "Lange dubbele druk gedetecteerd"
+    lambda: |-
+      return id(long_double_press_detected);
+
+  - platform: template
+    name: "Stopcontact"
+    device_class: plug
+    lambda: |-
+      if (id(power).state > 0) {
+        return true;  // Device is plugged in
+      } else {
+        return false;  // Device is not plugged in
+      }
+
+sensor:
+  - platform: integration
+    name: "Energie"
+    sensor: power_raw
+    time_unit: h
+    restore: true
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    filters:
+      - multiply: 0.001  # Converts W·h → kWh
+
+  - platform: bmp280_i2c
+    temperature:
+      name: "Temperatuur"
+      oversampling: 16x
+    pressure:
+      name: "Druk"
+
+
+  - platform: internal_temperature
+    name: "Interne temperatuur"
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: 5min
