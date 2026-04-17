@@ -73,9 +73,10 @@ light:
           lambda: |-
             static float brightness = 0.05;
             static int direction = 1;
-          
-            it[0] = Color::color_brightness(Color(255, 255, 255), brightness);
-          
+            
+            uint8_t v = brightness * 255;
+            it[0] = Color(v, v, v);
+            
             brightness += direction * 0.002;
             if (brightness >= 0.3) direction = -1;
             if (brightness <= 0.05) direction = 1;
@@ -83,59 +84,62 @@ light:
           name: "Rickroll"
           update_interval: 20ms  # smaller interval for smoother fade
           lambda: |-
-            const int beat_count = 17;
-            const int beat_times[beat_count] = {
-              0, 500, 1000, 1500, 2200, 2900, 3400, 3900, 4400, 4900,
-              5600, 6100, 6600, 7100, 7600, 8100, 8600
-            };
-            const int beat_durations[beat_count] = {
-              400, 400, 400, 400, 400, 400, 400, 400, 400, 500,
-              400, 400, 400, 400, 400, 500, 500
-            };
-      
-            const float min_brightness = 0.05;
-            const float max_brightness = 0.9;
-      
-            static unsigned long start_time = millis();
-            unsigned long now = millis() - start_time;
-      
-            const unsigned long total_duration = 9100;
-      
+            static uint32_t start_time = millis();
+            uint32_t now = millis() - start_time;
+            
+            const uint32_t total_duration = 9100;
             if (now >= total_duration) {
               start_time = millis();
               now = 0;
             }
-      
+            
+            float t = 0.0f;
+            
+            const int beat_times[] = {
+              0, 500, 1000, 1500, 2200, 2900, 3400, 3900,
+              4400, 4900, 5600, 6100, 6600, 7100, 7600, 8100, 8600
+            };
+            
+            const int beat_durations[] = {
+              400, 400, 400, 400, 400, 400, 400, 400,
+              400, 500, 400, 400, 400, 400, 400, 500, 500
+            };
+            
+            const int beat_count = 17;
+            
             int i;
             for (i = 0; i < beat_count; i++) {
               if (now >= beat_times[i] && now < beat_times[i] + beat_durations[i]) {
                 break;
               }
             }
-      
-            float brightness = min_brightness;
-      
+            
+            float brightness = 0.05;
+            
             if (i < beat_count) {
-              unsigned long beat_progress = now - beat_times[i];
-              float progress = (float) beat_progress / beat_durations[i];
-              brightness = min_brightness +
-                           (max_brightness - min_brightness) *
-                           sin(progress * 3.14159);
+              t = (float)(now - beat_times[i]) / beat_durations[i];
+              if (t > 1.0f) t = 1.0f;
+            
+              brightness = 0.05f + (0.9f - 0.05f) * sinf(t * 3.14159f);
             }
-      
-            it[0] = Color::color_brightness(Color(255, 0, 0), brightness);
+            
+            uint8_t v = (uint8_t)(brightness * 255);
+            
+            // correct WS2812 output
+            it[0] = Color(v, 0, 0);
       - lambda:
           name: "Bliksemflits"
           update_interval: 10ms
           lambda: |-
             static float brightness = 0.0;
-          
+            
             if (random_float() < 0.02)
               brightness = 1.0;
-          
+            
             brightness *= 0.9;
-          
-            it[0] = Color::color_brightness(Color(255, 255, 255), brightness);
+            
+            uint8_t v = brightness * 255;
+            it[0] = Color(v, v, v);
       - lambda:
           name: "Waarschuwing"
           update_interval: 100ms
