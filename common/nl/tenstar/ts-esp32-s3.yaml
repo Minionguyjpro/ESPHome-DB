@@ -1,9 +1,5 @@
 substitutions:
   local: false
-  relay_restart_actions: |-
-    - switch.turn_off: relay
-    - delay: 2s
-    - switch.turn_on: relay
 
 packages:
   common: !include ../generic.yaml
