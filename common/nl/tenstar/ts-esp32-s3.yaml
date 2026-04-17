@@ -91,7 +91,7 @@ font:
 
 display:
   - platform: st7789v
-    model: 1.14-inch TFT display
+    model: ADAFRUIT_S2_TFT_FEATHER_240X135
     backlight_pin: GPIO45
     rotation: 90
     cs_pin: GPIO7
