@@ -249,8 +249,6 @@ sensor:
     pressure:
       name: "Druk"
     iir_filter: 16x
-    filters:
-      - calibrate_offset: -20.0
 
   - platform: internal_temperature
     name: "Interne temperatuur"
