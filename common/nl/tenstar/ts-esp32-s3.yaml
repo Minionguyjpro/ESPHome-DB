@@ -247,7 +247,7 @@ sensor:
       name: "Temperatuur"
       oversampling: 16x
       filters:
-        - offset: -20.0
+        - offset: -14.0
     pressure:
       name: "Druk"
     iir_filter: 16x
