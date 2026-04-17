@@ -248,6 +248,7 @@ sensor:
       oversampling: 16x
     pressure:
       name: "Druk"
+    iir_filter: 16x
 
   - platform: internal_temperature
     name: "Interne temperatuur"
