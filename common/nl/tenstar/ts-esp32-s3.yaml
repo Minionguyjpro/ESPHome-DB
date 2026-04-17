@@ -172,6 +172,13 @@ output:
     frequency: 1000 Hz
     max_power: 100%
 
+switch:
+  - platform: template
+    id: relay
+    internal: true
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
 binary_sensor:
   - platform: gpio
     pin:
