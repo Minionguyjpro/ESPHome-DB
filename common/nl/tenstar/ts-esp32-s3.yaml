@@ -254,16 +254,6 @@ binary_sensor:
     lambda: |-
       return id(long_double_press_detected);
 
-  - platform: template
-    name: "Stopcontact"
-    device_class: plug
-    lambda: |-
-      if (id(power).state > 0) {
-        return true;  // Device is plugged in
-      } else {
-        return false;  // Device is not plugged in
-      }
-
 sensor:
   - platform: integration
     name: "Energie"
