@@ -236,17 +236,6 @@ binary_sensor:
       return id(long_double_press_detected);
 
 sensor:
-  - platform: integration
-    name: "Energie"
-    sensor: power_raw
-    time_unit: h
-    restore: true
-    unit_of_measurement: "kWh"
-    device_class: energy
-    state_class: total_increasing
-    filters:
-      - multiply: 0.001  # Converts W·h → kWh
-
   - platform: bmp280_i2c
     temperature:
       name: "Temperatuur"
