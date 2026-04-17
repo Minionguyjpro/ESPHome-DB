@@ -40,12 +40,10 @@ globals:
     initial_value: '""'
 
 light:
-  - platform: rgb
+  - platform: neopixelbus
     id: led
     name: "LED"
-    red: led_red
-    green: led_green
-    blue: led_red
+    num_leds: 1
     default_transition_length: 0.5s
     gamma_correct: 2.0
     effects:
@@ -73,7 +71,9 @@ light:
           lambda: |-
             static float brightness = 0.05;
             static int direction = 1;
-            id(led_green).set_level(brightness);
+          
+            it[0] = Color::color_brightness(Color(255, 255, 255), brightness);
+          
             brightness += direction * 0.002;
             if (brightness >= 0.3) direction = -1;
             if (brightness <= 0.05) direction = 1;
@@ -81,7 +81,6 @@ light:
           name: "Rickroll"
           update_interval: 20ms  # smaller interval for smoother fade
           lambda: |-
-            // --- Configuration ---
             const int beat_count = 17;
             const int beat_times[beat_count] = {
               0, 500, 1000, 1500, 2200, 2900, 3400, 3900, 4400, 4900,
@@ -91,86 +90,62 @@ light:
               400, 400, 400, 400, 400, 400, 400, 400, 400, 500,
               400, 400, 400, 400, 400, 500, 500
             };
-
+      
             const float min_brightness = 0.05;
             const float max_brightness = 0.9;
-
-            // --- State ---
+      
             static unsigned long start_time = millis();
             unsigned long now = millis() - start_time;
-
-            // Total duration
-            const unsigned long total_duration = 9100;  // ms
-
-            // Restart loop
+      
+            const unsigned long total_duration = 9100;
+      
             if (now >= total_duration) {
               start_time = millis();
               now = 0;
             }
-
-            // Determine which beat we're in
+      
             int i;
             for (i = 0; i < beat_count; i++) {
-              if (now >= beat_times[i] && now < beat_times[i] + beat_durations[i])
+              if (now >= beat_times[i] && now < beat_times[i] + beat_durations[i]) {
                 break;
+              }
             }
-
+      
             float brightness = min_brightness;
-
+      
             if (i < beat_count) {
-              // Time within current beat
               unsigned long beat_progress = now - beat_times[i];
-              float progress = (float)beat_progress / beat_durations[i];
-              // Smooth fade in/out
-              brightness = min_brightness + (max_brightness - min_brightness) * sin(progress * 3.14159);
+              float progress = (float) beat_progress / beat_durations[i];
+              brightness = min_brightness +
+                           (max_brightness - min_brightness) *
+                           sin(progress * 3.14159);
             }
-
-            // Apply PWM brightness
-            id(led_green).set_level(brightness);
+      
+            it[0] = Color::color_brightness(Color(255, 0, 0), brightness);
       - lambda:
           name: "Bliksemflits"
           update_interval: 10ms
           lambda: |-
             static float brightness = 0.0;
-            if (random_float() < 0.02) brightness = 1.0;  // Random flash
-            brightness *= 0.9;  // Fade out
-            id(led_green).set_level(brightness);
+          
+            if (random_float() < 0.02)
+              brightness = 1.0;
+          
+            brightness *= 0.9;
+          
+            it[0] = Color::color_brightness(Color(255, 255, 255), brightness);
       - lambda:
           name: "Waarschuwing"
           update_interval: 100ms
           lambda: |-
             static bool state = false;
             state = !state;
-
+          
             if (state) {
-              id(led_red).set_level(1.0);
-              id(led_green).set_level(0.0);
+              it[0] = Color(255, 0, 0);
             } else {
-              id(led_red).set_level(0.0);
-              id(led_green).set_level(0.0);
+              it[0] = Color(0, 0, 0);
             }
-
-output:
-  - platform: esp8266_pwm
-    id: led_red
-    pin: GPIO33    # Red channel / single LED control
-    inverted: true
-    frequency: 1000 Hz
-    max_power: 100%
-
-  - platform: esp8266_pwm
-    id: led_green
-    pin: GPIO33    # Green channel / single LED control
-    inverted: true
-    frequency: 1000 Hz
-    max_power: 100%
-
-  - platform: esp8266_pwm
-    id: led_blue
-    pin: GPIO33    # Green channel / single LED control
-    inverted: true
-    frequency: 1000 Hz
-    max_power: 100%
 
 switch:
   - platform: template
@@ -278,7 +253,6 @@ sensor:
       oversampling: 16x
     pressure:
       name: "Druk"
-
 
   - platform: internal_temperature
     name: "Interne temperatuur"
