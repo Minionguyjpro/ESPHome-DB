@@ -1,5 +1,6 @@
 substitutions:
   local: false
+  has_relay: "false"
 
 packages:
   common: !include ../generic.yaml
