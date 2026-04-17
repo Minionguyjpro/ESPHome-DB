@@ -172,44 +172,6 @@ output:
     frequency: 1000 Hz
     max_power: 100%
 
-interval:
-  - interval: 100ms
-    then:
-      - lambda: |-
-          float limit = id(current_limit).state;
-          float current = id(current_raw).state;
-
-          static int overcurrent_count = 0;
-
-          if (current > limit && limit > 0) {
-            overcurrent_count++;
-          } else {
-            overcurrent_count = 0;
-          }
-
-          if (overcurrent_count >= 3 && !id(overcurrent_alert)) {
-            ESP_LOGW("overcurrent", "Overcurrent: %.2fA > %.2fA", current, limit);
-
-            // Save current LED effect
-            std::string effect_name = id(led).get_effect_name();
-            if (!effect_name.empty()) {
-              id(previous_led_effect) = effect_name;
-            } else {
-              id(previous_led_effect) = "";
-            }
-
-            id(relay).turn_off();
-            id(overcurrent_alert) = true;
-          }
-
-      - if:
-          condition:
-            lambda: 'return id(overcurrent_alert);'
-          then:
-            - light.turn_on:
-                id: led
-                effect: "Waarschuwing"
-
 binary_sensor:
   - platform: gpio
     pin:
@@ -219,16 +181,6 @@ binary_sensor:
     name: "Aan/Uit-knop"
     entity_category: diagnostic
     on_multi_click:
-      - timing:
-          - ON for 30ms to 300ms
-          - OFF for at least 150ms
-        then:
-          - if:
-              condition:
-                lambda: 'return !id(overcurrent_alert);'
-              then:
-                - switch.toggle: relay
-
       - timing:
           - ON for at least 2s
         then:
