@@ -40,12 +40,13 @@ globals:
     initial_value: '""'
 
 light:
-  - platform: neopixelbus
+  - platform: esp32_rmt_led_strip
     id: led
     name: "LED"
     num_leds: 1
+    rgb_order: GRB
+    chipset: WS2812
     default_transition_length: 0.5s
-    gamma_correct: 2.0
     effects:
       - pulse:
           name: "Puls"
