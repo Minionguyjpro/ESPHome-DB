@@ -43,6 +43,7 @@ light:
   - platform: esp32_rmt_led_strip
     id: led
     name: "LED"
+    pin: GPIO33
     num_leds: 1
     rgb_order: GRB
     chipset: WS2812
