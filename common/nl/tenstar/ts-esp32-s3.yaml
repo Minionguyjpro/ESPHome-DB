@@ -28,10 +28,6 @@ spi:
   clk_pin: GPIO36
   mosi_pin: GPIO35
 
-power_supply:
-  - id: power_supply1
-    pin: GPIO21
-
 logger:
 
 globals:
