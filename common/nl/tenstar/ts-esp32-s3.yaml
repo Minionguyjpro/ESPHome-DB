@@ -100,6 +100,8 @@ display:
     cs_pin: GPIO7
     dc_pin: GPIO39
     reset_pin: GPIO40
+    offset_height: 40
+    offset_width: 52
     update_interval: 1s
     lambda: |-
       it.rectangle(0,  0, it.get_width(), it.get_height(), id(lcd_blue));
