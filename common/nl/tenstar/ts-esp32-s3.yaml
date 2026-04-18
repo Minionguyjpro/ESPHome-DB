@@ -303,6 +303,10 @@ binary_sensor:
           - lambda: |-
               id(long_double_press_detected) = false;
 
+  - platform: status
+    name: "Systeemstatus"
+    id: system_status
+
   - platform: template
     name: "Dubbele druk gedetecteerd"
     lambda: |-
