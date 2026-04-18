@@ -8,12 +8,10 @@ esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
   on_boot:
-    priority: 1000
+    priority: 800
     then:
-      - lambda: |-
-          pinMode(7, OUTPUT);
-          digitalWrite(7, HIGH);
-          delay(10);
+      - output.turn_on: tft_power
+      - delay: 100ms
 
 esp32:
   board: adafruit_feather_esp32s3_tft
@@ -93,10 +91,14 @@ font:
     id: roboto
     size: 20
 
+output:
+  - platform: gpio
+    pin: GPIO21
+    id: tft_power
+
 display:
   - platform: st7789v
     model: TTGO_TDISPLAY_135X240
-    power_supply: power_supply1
     backlight_pin: GPIO45
     rotation: 90
     cs_pin: GPIO7
