@@ -7,13 +7,6 @@ packages:
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
-  on_boot:
-    priority: 1000
-    then:
-      - lambda: |-
-          pinMode(7, OUTPUT);
-          digitalWrite(7, HIGH);
-          delay(10);
 
 esp32:
   board: adafruit_feather_esp32s3_tft
@@ -29,6 +22,10 @@ i2c:
 spi:
   clk_pin: GPIO36
   mosi_pin: GPIO35
+
+power_supply:
+  - id: power_supply1
+    pin: GPIO21
 
 logger:
 
@@ -92,6 +89,7 @@ font:
 display:
   - platform: st7789v
     model: ADAFRUIT_S2_TFT_FEATHER_240X135
+    power_supply: power_supply1
     backlight_pin: GPIO45
     rotation: 90
     cs_pin: GPIO7
