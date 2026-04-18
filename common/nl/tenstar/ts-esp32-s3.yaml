@@ -88,7 +88,7 @@ font:
 
 display:
   - platform: st7789v
-    model: ADAFRUIT_S2_TFT_FEATHER_240X135
+    model: TTGO_TDISPLAY_135X240
     power_supply: power_supply1
     backlight_pin: GPIO45
     rotation: 90
