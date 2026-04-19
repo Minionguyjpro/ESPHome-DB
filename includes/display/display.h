@@ -1,5 +1,6 @@
 #pragma once
 
+#include "background.h"
 #include "header.h"
 #include "home_page.h"
 
