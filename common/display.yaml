@@ -1,10 +1,3 @@
-external_components:
-  - source:
-      type: git
-      url: https://github.com/Minionguyjpro/ESPHome-DB
-      ref: main
-      path: includes
-    components: [_display]
-    refresh: 1h
-
-_display:
+esphome:
+  includes:
+    - .esphome/packages/c2c269f7/includes/_display/
