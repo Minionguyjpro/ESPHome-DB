@@ -7,7 +7,7 @@ void draw_home_page(esphome::display::Display &it) {
   
   // Temperature (C)
   it.printf(x, y,
-            &id(large),
+            &id(medium),
             id(lcd_green),
             esphome::display::COLOR_OFF,
             esphome::display::TextAlign::TOP_LEFT,
