@@ -4,7 +4,7 @@
 #include "header.h"
 #include "home_page.h"
 
-void draw_display(DisplayBuffer &it) {
+void draw_display(Display &it) {
   draw_background(it);
   draw_header(it);
   draw_home(it);
