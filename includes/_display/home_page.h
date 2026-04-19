@@ -1,6 +1,6 @@
 #pragma once
 
-void draw_home(DisplayBuffer &it) {
+void draw_home(Display &it) {
   it.printf((240 / 2), (140 / 6) * 1 + 5,
             id(large), id(lcd_green),
             TextAlign::TOP_CENTER,
