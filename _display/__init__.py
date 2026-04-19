@@ -1,9 +1,15 @@
 import esphome.config_validation as cv
 import esphome.codegen as cg
 
-# Allow use as external component without any additional settings.
-# cv.ensure_dict coerces a bare `_display:` (None) to {} before validation.
-CONFIG_SCHEMA = cv.All(cv.ensure_dict, cv.Schema({}))
+
+def _validate(config):
+    # A bare `_display:` in YAML produces None; treat it as an empty dict.
+    if config is None:
+        config = {}
+    return cv.Schema({})(config)
+
+
+CONFIG_SCHEMA = _validate
 
 
 async def to_code(config):
