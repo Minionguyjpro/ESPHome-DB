@@ -1,8 +1,8 @@
 #pragma once
 
-#include "_display/background.h"
-#include "_display/header.h"
-#include "_display/home_page.h"
+#include "background.h"
+#include "header.h"
+#include "home_page.h"
 
 void draw_display(DisplayBuffer &it) {
   draw_background(it);
