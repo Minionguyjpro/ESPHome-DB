@@ -3,7 +3,6 @@ external_components:
       type: git
       url: https://github.com/Minionguyjpro/ESPHome-DB
       ref: main
-      path: includes
     components: [_display]
 
 _display:
