@@ -1,7 +1,9 @@
 #pragma once
 
 void draw_home_page(esphome::display::Display &it) {
-  it.printf(240 / 2, (140 / 6) * 1 + 5,
+
+  // Temperature (C)
+  it.printf(120, 60,
             id(large),
             id(lcd_green),
             esphome::display::COLOR_OFF,
@@ -9,6 +11,7 @@ void draw_home_page(esphome::display::Display &it) {
             "%.1f °C",
             id(temperature).state);
 
+  // Temperature (F)
   it.printf(5, (140 / 6) * 3 + 10,
             id(medium),
             id(lcd_green),
