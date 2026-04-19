@@ -4,6 +4,7 @@ void draw_header(esphome::display::Display &it) {
   it.print(5, 5,
            id(font20),
            id(lcd_yellow),
+           esphome::display::TextAlign::TOP_LEFT,
            "HELLO");
 
   if (id(system_status).state) {
