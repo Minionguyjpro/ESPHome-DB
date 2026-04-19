@@ -13,7 +13,7 @@ void draw_home_page(esphome::display::Display &it) {
 
   // Temperature (F)
   it.printf(5, (140 / 6) * 3 + 10,
-            istatic_cast<esphome::display::BaseFont *>(id(medium))
+            istatic_cast<esphome::display::BaseFont *>(id(medium)),
             id(lcd_green),
             esphome::display::COLOR_OFF,
             esphome::display::TextAlign::TOP_LEFT,
