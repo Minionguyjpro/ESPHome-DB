@@ -1,6 +1,6 @@
 #pragma once
 
-void draw_header(DisplayBuffer &it) {
+void draw_header(Display &it) {
   it.print(5, 5, id(font20), id(lcd_yellow), "HELLO");
 
   if (id(system_status).state) {
