@@ -1,0 +1,6 @@
+esphome:
+  includes:
+    - display/display.h
+    - display/background.h
+    - display/header.h
+    - display/home_page.h
