@@ -1,7 +1,3 @@
 esphome:
   includes:
-    - includes/display/display.h
-    - includes/display/background.h
-    - includes/display/header.h
-    - includes/display/home_page.h
-    - includes/display/pages.h
+    - ${repo_root}/../includes/
