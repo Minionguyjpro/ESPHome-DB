@@ -2,10 +2,11 @@
 
 void draw_home_page(esphome::display::Display &it) {
 
+  int x = 5;
   int y = (140 / 6) * 3 + 10;
   
   // Temperature (C)
-  it.printf(5, y,
+  it.printf(x, y,
             &id(large),
             id(lcd_green),
             esphome::display::COLOR_OFF,
@@ -14,7 +15,7 @@ void draw_home_page(esphome::display::Display &it) {
             id(temperature).state);
 
   // Temperature (F)
-  it.printf(5, y + 20,
+  it.printf(x, y + 20,
             &id(medium),
             id(lcd_green),
             esphome::display::COLOR_OFF,
