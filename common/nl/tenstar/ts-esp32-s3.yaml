@@ -22,6 +22,7 @@ i2c:
 spi:
   clk_pin: GPIO36
   mosi_pin: GPIO35
+  miso_pin: GPIO37
 
 power_supply:
   - id: tft_pwr_en
