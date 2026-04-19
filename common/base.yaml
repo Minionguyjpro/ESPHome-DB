@@ -1,6 +1,3 @@
-substitutions:
-  repo_root: "."
-
 safe_mode:
   boot_is_good_after: 1min
   reboot_timeout: 5min
