@@ -1,3 +1,6 @@
-esphome:
-  includes:
-    - ${repo_root}/../includes/
+external_components:
+  - source:
+      type: local
+      path: ../includes
+
+_display:
