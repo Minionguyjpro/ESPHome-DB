@@ -3,6 +3,7 @@ substitutions:
 
 packages:
   common: !include ../generic.yaml
+  display: !include ../../display.yaml
 
 esphome:
   name: ${device_name}
@@ -101,19 +102,7 @@ display:
     offset_width: 52
     update_interval: 1s
     lambda: |-
-      it.rectangle(0,  0, it.get_width(), it.get_height(), id(lcd_blue));
-      it.rectangle(0, 25, it.get_width(), it.get_height(), id(lcd_blue));
-
-      it.print(5, 5, id(font20), id(lcd_yellow), TextAlign::TOP_LEFT, "HELLO");
-      if (id(system_status).state) {
-        it.print(235, 5, id(font20), id(lcd_green), TextAlign::TOP_RIGHT, "Online");
-      }
-      else {
-        it.print(235, 5, id(font20), id(lcd_red), TextAlign::TOP_RIGHT, "Offline");
-      }
-
-      it.printf((240 / 2), (140 / 6) * 1 + 5, id(large), id(lcd_green), TextAlign::TOP_CENTER, "%.1f °C", id(temperature).state);
-      it.printf(5, (140 / 6) * 3 + 10, id(medium), id(lcd_green), TextAlign::TOP_LEFT, "%.1f °F", id(temperature).state*9/5+32);
+      draw_display(it);
 
 light:
   - platform: esp32_rmt_led_strip
