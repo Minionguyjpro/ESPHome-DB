@@ -39,5 +39,5 @@ void draw_home_page(esphome::display::Display &it) {
             esphome::display::COLOR_OFF,
             esphome::display::TextAlign::TOP_LEFT,
             "Chip: %.0f °C",
-            id(internal_temperature).state);
+            id(internal_temp).state);
 }
