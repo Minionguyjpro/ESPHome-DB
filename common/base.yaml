@@ -1,8 +1,8 @@
 substitutions:
-  wifi_ssid: !secret wifi_ssid
-  wifi_password: !secret wifi_password
-  gateway_ip: !secret gateway_ip
-  subnet_mask: !secret subnet_mask
+  wifi_ssid: ""
+  wifi_password: ""
+  gateway_ip: ""
+  subnet_mask: ""
   dns1: !secret dns1
   dns2: !secret dns2
 
