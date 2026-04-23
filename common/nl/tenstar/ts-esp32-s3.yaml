@@ -324,6 +324,7 @@ sensor:
 
   - platform: internal_temperature
     name: "Interne temperatuur"
+    id: internal_temperature
     unit_of_measurement: "°C"
     device_class: temperature
     state_class: measurement
