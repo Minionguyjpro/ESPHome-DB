@@ -1,6 +1,5 @@
 #pragma once
 
-#include "tenstar_elements.h"
 #include "background.h"
 #include "header.h"
 #include "home_page.h"

@@ -320,6 +320,7 @@ sensor:
         - offset: -13.0
     pressure:
       name: "Druk"
+      id: pressure
     iir_filter: 16x
 
   - platform: internal_temperature

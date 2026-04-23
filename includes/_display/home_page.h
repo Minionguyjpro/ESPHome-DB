@@ -1,28 +1,12 @@
 #pragma once
 
-// tenstar_elements.h is included via display.h before this header, but pull
-// it in explicitly so home_page.h is self-contained when included on its own.
-#include "tenstar_elements.h"
-
 void draw_home_page(esphome::display::Display &it) {
-
-  // ── Dynamic layout ───────────────────────────────────────────────────────
-  // When elements have been registered at boot (via tenstar_register_element),
-  // render them and skip the hard-coded fallback below.
-  if (!tenstar_elements.empty()) {
-    tenstar_draw_elements(it);
-    return;
-  }
-
-  // ── Hard-coded fallback (backward compatibility) ─────────────────────────
-  // Used when no elements have been registered, so that existing device YAMLs
-  // that do NOT call tenstar_register_element continue to work unchanged.
-
+  // Display is 240 x 135 px (rotation 90°).
+  // Header bar occupies y=0..25; content area starts at y=28.
   int x = 5;
-  int y = (140 / 6) * 3 + 10;
-  
-  // Temperature (C)
-  it.printf(x, y,
+
+  // Temperature in °C
+  it.printf(x, 28,
             &id(medium),
             id(lcd_green),
             esphome::display::COLOR_OFF,
@@ -30,12 +14,30 @@ void draw_home_page(esphome::display::Display &it) {
             "%.1f °C",
             id(temperature).state);
 
-  // Temperature (F)
-  it.printf(x, y + 20,
-            &id(medium),
-            id(lcd_green),
+  // Temperature in °F
+  it.printf(x, 68,
+            &id(font20),
+            id(lcd_gray),
             esphome::display::COLOR_OFF,
             esphome::display::TextAlign::TOP_LEFT,
             "%.1f °F",
-            id(temperature).state * 9 / 5 + 32);
+            id(temperature).state * 9.0f / 5.0f + 32.0f);
+
+  // Atmospheric pressure
+  it.printf(x, 92,
+            &id(font20),
+            id(lcd_blue),
+            esphome::display::COLOR_OFF,
+            esphome::display::TextAlign::TOP_LEFT,
+            "%.1f hPa",
+            id(pressure).state);
+
+  // Internal chip temperature
+  it.printf(x, 114,
+            &id(roboto),
+            id(lcd_gray),
+            esphome::display::COLOR_OFF,
+            esphome::display::TextAlign::TOP_LEFT,
+            "Chip: %.0f °C",
+            id(internal_temperature).state);
 }
