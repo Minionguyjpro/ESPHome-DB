@@ -1,5 +1,6 @@
 # ESPHome-DB
-Database with config files for my own ESPHome setup.
+Database with config files for my own ESPHome setup. Feel free to reuse or make contributions.
+The goal of this project is to make my ESPHome ecosystem as modular as possible, reusing common sensors as much as possible to make every device in your home equally capable!
 ## Usage
 To use in your own project, only specify something like the following inside your device's YAML:
 ```yaml
