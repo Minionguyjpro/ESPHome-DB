@@ -14,6 +14,10 @@ substitutions:
   device_name: aquariumlamp
   friendly_name: Aquariumlamp
   static_ip: 192.168.1.105
+  wifi_ssid: !secret wifi_ssid_lan
+  wifi_password: !secret wifi_password_lan
+  gateway_ip: !secret gateway_ip_lan
+  subnet_mask: !secret subnet_mask
 ```
 
 ## Global IDs
