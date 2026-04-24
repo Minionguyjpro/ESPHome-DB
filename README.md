@@ -14,3 +14,10 @@ substitutions:
   friendly_name: Aquariumlamp
   static_ip: 192.168.1.105
 ```
+
+## Global IDs
+| **ID**           | **Type**     | **Description**                  | **Example Usage**             |
+|------------------|--------------|----------------------------------|-------------------------------|
+| ``local_time``   | Time         | Current local time (RTC/SNTP)    | ``id(local_time).now().hour`` |
+| ``ha_connected`` | BinarySensor | State of HA connection (on/off)  |                               |
+|                  |              |                                  |                               |
