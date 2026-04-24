@@ -3,6 +3,7 @@ packages:
 
 time:
   - platform: sntp
+    id: local_time
     timezone: Europe/Amsterdam
     servers:
       - 0.nl.pool.ntp.org
