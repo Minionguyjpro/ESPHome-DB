@@ -30,7 +30,7 @@ debug:
 # Enable OTA
 ota:
   platform: esphome
-  password: !secret ota_password
+  encryption:
 
 # Enable web server
 web_server:
