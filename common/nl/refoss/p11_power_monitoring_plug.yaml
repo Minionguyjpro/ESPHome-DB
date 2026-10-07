@@ -248,8 +248,7 @@ binary_sensor:
       number: GPIO5
       mode: INPUT_PULLUP
       inverted: true
-    name: "Aan/Uit-knop"
-    object_id: "aan_uit_knop"
+    name: "Aan-uitknop"
     entity_category: diagnostic
     on_multi_click:
       - timing:
@@ -269,7 +268,7 @@ binary_sensor:
 
       - timing:
           - ON for 50ms to 250ms
-          - OFF for 50ms to 200ms
+          - OFF for 50ms to 200ms• Gereserveerd teken in entiteit ('Aan/Uit-knop'): De slash (/) in de naam Aan/Uit-knop is gereserveerd als URL-padscheidingsteken en is automatisch vervangen door een Unicode-fractieslash (⁄). Pas de naam van je entiteit aan en verwijder de slash (bijvoorbeeld Aan Uit-knop of Aan_Uit_knop). Dit wordt een foutmelding vanaf ESPHome 2027.7.0.
           - ON for 50ms to 250ms
           - OFF for at least 300ms
         then:
