@@ -268,7 +268,7 @@ binary_sensor:
 
       - timing:
           - ON for 50ms to 250ms
-          - OFF for 50ms to 200ms• Gereserveerd teken in entiteit ('Aan/Uit-knop'): De slash (/) in de naam Aan/Uit-knop is gereserveerd als URL-padscheidingsteken en is automatisch vervangen door een Unicode-fractieslash (⁄). Pas de naam van je entiteit aan en verwijder de slash (bijvoorbeeld Aan Uit-knop of Aan_Uit_knop). Dit wordt een foutmelding vanaf ESPHome 2027.7.0.
+          - OFF for 50ms to 200ms
           - ON for 50ms to 250ms
           - OFF for at least 300ms
         then:
