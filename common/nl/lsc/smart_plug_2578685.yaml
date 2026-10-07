@@ -131,8 +131,8 @@ binary_sensor:
       number: GPIO7
       mode: INPUT_PULLUP
       inverted: true
-    name: "aan_uit_knop"
-    friendly_name: "Aan/Uit-knop"
+    name: "Aan/Uit-knop"
+    object_id: "aan_uit_knop"
     entity_category: diagnostic
     on_press:
       then:
