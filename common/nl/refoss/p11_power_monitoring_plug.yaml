@@ -248,7 +248,8 @@ binary_sensor:
       number: GPIO5
       mode: INPUT_PULLUP
       inverted: true
-    name: "Aan/Uit-knop"
+    name: "aan_uit_knop"
+    friendly_name: "Aan/Uit-knop"
     entity_category: diagnostic
     on_multi_click:
       - timing:
