@@ -2,6 +2,10 @@ packages:
   common: !include ../base.yaml
 
 time:
+  - platform: homeassistant
+    id: ha_time
+    timezone: Europe/Amsterdam
+    
   - platform: sntp
     id: local_time
     timezone: Europe/Amsterdam
