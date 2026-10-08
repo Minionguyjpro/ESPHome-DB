@@ -1,10 +1,6 @@
 substitutions:
   wifi_ssid: ""
   wifi_password: ""
-  gateway_ip: ""
-  subnet_mask: ""
-  dns1: !secret dns1
-  dns2: !secret dns2
 
 safe_mode:
   boot_is_good_after: 1min
