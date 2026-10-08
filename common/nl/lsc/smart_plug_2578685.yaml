@@ -8,7 +8,6 @@ substitutions:
 packages:
   common: !include ../generic.yaml
   libretiny: !include ../libretiny.yaml
-  bluetooth: !include ../../bk72xx/bluetooth.yaml
 
 esphome:
   name: ${device_name}
