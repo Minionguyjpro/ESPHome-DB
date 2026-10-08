@@ -9,12 +9,6 @@ safe_mode:
 wifi:
   ssid: ${wifi_ssid}
   password: ${wifi_password}
-  manual_ip:
-    static_ip: ${static_ip}
-    gateway: ${gateway_ip}
-    subnet: ${subnet_mask}
-    dns1: ${dns1}
-    dns2: ${dns2}
   ap:
     ssid: "${friendly_name} Fallback Hotspot"
     password: !secret ap_password
