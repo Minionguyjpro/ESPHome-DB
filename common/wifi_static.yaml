@@ -1,0 +1,15 @@
+substitutions:
+  wifi_ssid: ""
+  wifi_password: ""
+  gateway_ip: ""
+  subnet_mask: ""
+  dns1: !secret dns1
+  dns2: !secret dns2
+
+wifi:
+  manual_ip:
+    static_ip: ${static_ip}
+    gateway: ${gateway_ip}
+    subnet: ${subnet_mask}
+    dns1: ${dns1}
+    dns2: ${dns2}
