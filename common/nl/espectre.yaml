@@ -8,10 +8,24 @@ external_components:
     refresh: always
 
 espectre:
-
-binary_sensor:
-  - platform: espectre
-    motion:
-      name: "Beweging"
-    calibrating:
-      name: "Beweging kalibreren"
+  movement_sensor:
+    name: "Bewegingsscore"
+    icon: "mdi:sine-wave"
+    filters:
+      - multiply: 100
+      - clamp:
+          min_value: 0
+          max_value: 100
+      - round: 1
+  motion_sensor:
+    name: "Beweging"
+    icon: "mdi:motion-sensor"
+  calibration_active_sensor:
+    name: "Beweging kalibreren"
+  threshold_number:
+    name: "Beweging drempelwaarde"
+    icon: "mdi:ray-vertex"
+  sensing_switch:
+    name: "Bewegingsdetectie"
+    icon: "mdi:radar"
+    
