@@ -1,0 +1,17 @@
+external_components:
+  - source:
+      type: git
+      url: https://github.com/francescopace/espectre
+      ref: main
+      path: src/cpp/frontend/esphome/components
+    components: [espectre]
+    refresh: always
+
+espectre:
+
+binary_sensor:
+  - platform: espectre
+    motion:
+      name: "Beweging"
+    calibrating:
+      name: "Beweging kalibreren"
