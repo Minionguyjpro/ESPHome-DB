@@ -28,4 +28,3 @@ espectre:
   sensing_switch:
     name: "Bewegingsdetectie"
     icon: "mdi:radar"
-    
