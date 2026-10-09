@@ -4,6 +4,7 @@ substitutions:
 packages:
   common: !include ../generic.yaml
   display: !include ../../display.yaml
+  espectre: !include ../espectre.yaml
 
 esphome:
   name: ${device_name}
