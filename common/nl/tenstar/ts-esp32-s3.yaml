@@ -4,6 +4,7 @@ substitutions:
 packages:
   common: !include ../generic.yaml
   display: !include ../../display.yaml
+  bluetooth: !include ../../esp32/bluetooth.yaml
   espectre: !include ../espectre.yaml
 
 esphome:
