@@ -6,6 +6,9 @@ binary_sensor:
       name: "Beweging"
     calibrating:
       name: "Beweging kalibreren"
+
+sensor:
+  - platform: espectre
     movement:
       name: "Bewegingsscore"
 
