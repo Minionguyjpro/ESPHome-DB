@@ -1,30 +1,18 @@
-external_components:
-  - source:
-      type: git
-      url: https://github.com/francescopace/espectre
-      ref: main
-      path: src/cpp/frontend/esphome/components
-    components: [espectre]
-    refresh: always
-
 espectre:
-  movement_sensor:
-    name: "Bewegingsscore"
-    icon: "mdi:sine-wave"
-    filters:
-      - multiply: 100
-      - clamp:
-          min_value: 0
-          max_value: 100
-      - round: 1
-  motion_sensor:
-    name: "Beweging"
-    icon: "mdi:motion-sensor"
-  calibration_active_sensor:
-    name: "Beweging kalibreren"
-  threshold_number:
-    name: "Beweging drempelwaarde"
-    icon: "mdi:ray-vertex"
-  sensing_switch:
-    name: "Bewegingsdetectie"
-    icon: "mdi:radar"
+
+binary_sensor:
+  - platform: espectre
+    motion:
+      name: "Beweging"
+    calibrating:
+      name: "Beweging kalibreren"
+    movement:
+      name: "Bewegingsscore"
+
+select:
+  - platform: espectre
+    name: "CSI verkeersbron"
+
+button:
+  - platform: espectre
+    name: "Herkalibreren"
