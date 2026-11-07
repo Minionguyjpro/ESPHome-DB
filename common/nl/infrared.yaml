@@ -1,0 +1,20 @@
+substitutions:
+  ir_rx_pin: ""
+  ir_tx_pin: ""
+
+remote_receiver:
+  id: ir_rx
+  pin: ${ir_rx_pin}
+
+remote_transmitter:
+  - id: ir_tx
+    pin: ${ir_tx_pin}
+    carrier_duty_percent: 50%
+
+infrared:
+  - platform: ir_rf_proxy
+    name: IR-zender
+    remote_transmitter_id: ir_tx
+  - platform: ir_rf_proxy
+    name: IR-ontvanger
+    remote_receiver_id: ir_rx
