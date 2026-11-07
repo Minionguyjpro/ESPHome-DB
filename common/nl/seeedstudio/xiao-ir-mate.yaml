@@ -1,0 +1,261 @@
+substitutions:
+  local: false
+
+packages:
+  common: !include ../generic.yaml
+  espectre: !include ../espectre.yaml
+  infrared:
+    file: ../infrared.yaml
+    vars:
+      ir_rx_pin: GPIO4
+      ir_tx_pin: GPIO3
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: seeed_xiao_esp32c3
+  variant: esp32c3
+  framework:
+    type: esp-idf
+
+logger:
+
+globals:
+  - id: double_press_detected
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+  - id: long_double_press_detected
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+  - id: overcurrent_alert
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+  - id: previous_led_effect
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+
+light:
+  - platform: rgb
+    id: led
+    name: "LED"
+    red: output_red
+    green: output_green
+    blue: output_blue
+    default_transition_length: 0.5s
+    effects:
+      - pulse:
+          name: "Puls"
+      - pulse:
+          name: "Snelle puls"
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Langzame puls"
+          transition_length: 500ms
+          update_interval: 2s
+      - pulse:
+          name: "Asymmetrische puls"
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s
+      - addressable_lambda:
+          name: "Slaapmodus"
+          update_interval: 50ms
+          lambda: |-
+            static float brightness = 0.05;
+            static int direction = 1;
+            
+            uint8_t v = brightness * 255;
+            it[0] = Color(v, v, v);
+            
+            brightness += direction * 0.002;
+            if (brightness >= 0.3) direction = -1;
+            if (brightness <= 0.05) direction = 1;
+      - addressable_lambda:
+          name: "Rickroll"
+          update_interval: 20ms  # smaller interval for smoother fade
+          lambda: |-
+            static uint32_t start_time = millis();
+            uint32_t now = millis() - start_time;
+            
+            const uint32_t total_duration = 9100;
+            if (now >= total_duration) {
+              start_time = millis();
+              now = 0;
+            }
+            
+            float t = 0.0f;
+            
+            const int beat_times[] = {
+              0, 500, 1000, 1500, 2200, 2900, 3400, 3900,
+              4400, 4900, 5600, 6100, 6600, 7100, 7600, 8100, 8600
+            };
+            
+            const int beat_durations[] = {
+              400, 400, 400, 400, 400, 400, 400, 400,
+              400, 500, 400, 400, 400, 400, 400, 500, 500
+            };
+            
+            const int beat_count = 17;
+            
+            int i;
+            for (i = 0; i < beat_count; i++) {
+              if (now >= beat_times[i] && now < beat_times[i] + beat_durations[i]) {
+                break;
+              }
+            }
+            
+            float brightness = 0.05;
+            
+            if (i < beat_count) {
+              t = (float)(now - beat_times[i]) / beat_durations[i];
+              if (t > 1.0f) t = 1.0f;
+            
+              brightness = 0.05f + (0.9f - 0.05f) * sinf(t * 3.14159f);
+            }
+            
+            uint8_t v = (uint8_t)(brightness * 255);
+            
+            // correct WS2812 output
+            it[0] = Color(v, 0, 0);
+      - addressable_lambda:
+          name: "Bliksemflits"
+          update_interval: 10ms
+          lambda: |-
+            static float brightness = 0.0;
+            
+            if (random_float() < 0.02)
+              brightness = 1.0;
+            
+            brightness *= 0.9;
+            
+            uint8_t v = brightness * 255;
+            it[0] = Color(v, v, v);
+      - addressable_lambda:
+          name: "Waarschuwing"
+          update_interval: 100ms
+          lambda: |-
+            static bool state = false;
+            state = !state;
+          
+            if (state) {
+              it[0] = Color(255, 0, 0);
+            } else {
+              it[0] = Color(0, 0, 0);
+            }
+
+output:
+  - platform: esp32_pwm
+    id: output_red
+    pin: GPIO5
+  - platform: esp32_pwm
+    id: output_green
+    pin: GPIO0
+  - platform: esp32_pwm
+    id: output_blue
+    pin: GPIO1
+
+binary_sensor:
+  - platform: esp32_touch
+    name: "Aanraakknop"
+    pin: GPIO2
+    threshold: 1000
+    entity_category: diagnostic
+    on_multi_click:
+      - timing:
+          - ON for at least 2s
+        then:
+          - light.toggle: led
+
+      - timing:
+          - ON for 50ms to 250ms
+          - OFF for 50ms to 200ms
+          - ON for 50ms to 250ms
+          - OFF for at least 300ms
+        then:
+          - logger.log: "Double press detected"
+          - lambda: |-
+              id(double_press_detected) = true;
+          - delay: 500ms
+          - lambda: |-
+              id(double_press_detected) = false;
+
+      - timing:
+          - ON for 50ms to 250ms
+          - OFF for 50ms to 200ms
+          - ON for 50ms to 250ms
+          - OFF for 50ms to 200ms
+          - ON for 50ms to 250ms
+          - OFF for at least 300ms
+        then:
+          - logger.log: "Triple press detected"
+          - lambda: |-
+              std::string current = id(led).get_effect_name();
+
+              if (current != "Bliksemflits") {
+                if (!current.empty()) {
+                  id(previous_led_effect) = current;
+                } else {
+                  id(previous_led_effect) = "";
+                }
+
+                auto call = id(led).turn_on();
+                call.set_effect("Bliksemflits");
+                call.perform();
+              } else {
+                if (!id(previous_led_effect).empty()) {
+                  auto call = id(led).turn_on();
+                  call.set_effect(id(previous_led_effect).c_str());
+                  call.perform();
+                } else {
+                  id(led).turn_off();
+                }
+              }
+
+      - timing:
+          - ON for at least 2s
+          - OFF for 200ms to 2s
+          - ON for at least 2s
+        then:
+          - logger.log: "Long double press detected"
+          - lambda: |-
+              id(long_double_press_detected) = true;
+          - delay: 500ms
+          - lambda: |-
+              id(long_double_press_detected) = false;
+
+  - platform: status
+    name: "Systeemstatus"
+    id: system_status
+
+  - platform: template
+    name: "Dubbele druk gedetecteerd"
+    lambda: |-
+      return id(double_press_detected);
+
+  - platform: template
+    name: "Lange dubbele druk gedetecteerd"
+    lambda: |-
+      return id(long_double_press_detected);
+
+sensor:
+  - platform: internal_temperature
+    name: "Interne temperatuur"
+    id: internal_temp
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: 5min
