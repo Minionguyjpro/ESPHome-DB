@@ -2,14 +2,12 @@ substitutions:
   ir_rx_pin: ""
   ir_tx_pin: ""
 
-remote_receiver:
-  id: ir_rx
-  pin: ${ir_rx_pin}
-
-remote_transmitter:
-  - id: ir_tx
-    pin: ${ir_tx_pin}
-    carrier_duty_percent: 50%
+packages:
+  remote:
+    file: ../remote.yaml
+    vars:
+      ir_rx_pin: ${ir_rx_pin}
+      ir_tx_pin: ${ir_tx_pin}
 
 infrared:
   - platform: ir_rf_proxy
