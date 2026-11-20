@@ -4,7 +4,9 @@ substitutions:
 
 remote_receiver:
   id: ir_rx
-  pin: ${ir_rx_pin}
+  pin:
+    number: ${ir_rx_pin}
+    inverted: true
   tolerance: 25%
   idle: 50ms
   rmt_symbols: 96
