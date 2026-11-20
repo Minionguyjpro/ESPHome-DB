@@ -3,7 +3,7 @@ substitutions:
   ir_tx_pin: ""
 
 packages:
-  remote:
+  remote: !include
     file: ../remote.yaml
     vars:
       ir_rx_pin: ${ir_rx_pin}
