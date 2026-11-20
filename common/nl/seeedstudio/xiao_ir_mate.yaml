@@ -7,7 +7,7 @@ packages:
   infrared: !include
     file: ../infrared.yaml
     vars:
-      ir_rx_pin: GPIO4
+      ir_rx_pin: !GPIO4
       ir_tx_pin: GPIO3
 
 esphome:
