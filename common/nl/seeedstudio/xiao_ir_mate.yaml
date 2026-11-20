@@ -157,13 +157,13 @@ light:
             }
 
 output:
-  - platform: esp32_pwm
+  - platform: ledc
     id: output_red
     pin: GPIO5
-  - platform: esp32_pwm
+  - platform: ledc
     id: output_green
     pin: GPIO0
-  - platform: esp32_pwm
+  - platform: ledc
     id: output_blue
     pin: GPIO1
 
