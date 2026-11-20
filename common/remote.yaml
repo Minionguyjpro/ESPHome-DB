@@ -9,10 +9,10 @@ remote_receiver:
     inverted: true
   tolerance: 25%
   idle: 30ms
-  rmt_symbols: 96
+  rmt_symbols: 48
 
 remote_transmitter:
   - id: ir_tx
     pin: ${ir_tx_pin}
     carrier_duty_percent: 50%
-    rmt_symbols: 96
+    rmt_symbols: 48
