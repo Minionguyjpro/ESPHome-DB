@@ -5,8 +5,12 @@ substitutions:
 remote_receiver:
   id: ir_rx
   pin: ${ir_rx_pin}
+  tolerance: 25%
+  idle: 50ms
+  rmt_symbols: 96
 
 remote_transmitter:
   - id: ir_tx
     pin: ${ir_tx_pin}
     carrier_duty_percent: 50%
+    rmt_symbols: 96
