@@ -44,12 +44,14 @@ globals:
     initial_value: '""'
 
 light:
-  - platform: rgb
+  - platform: esp32_rmt_led_strip
     id: led
     name: "LED"
-    red: output_red
-    green: output_green
-    blue: output_blue
+    pin: GPIO7
+    num_leds: 1
+    rgb_order: GRB
+    chipset: WS2812
+    rmt_symbols: 48
     default_transition_length: 0.5s
     effects:
       - pulse:
@@ -156,21 +158,12 @@ light:
               it[0] = Color(0, 0, 0);
             }
 
-output:
-  - platform: ledc
-    id: output_red
-    pin: GPIO5
-  - platform: ledc
-    id: output_green
-    pin: GPIO0
-  - platform: ledc
-    id: output_blue
-    pin: GPIO1
-
 binary_sensor:
-  - platform: esp32_touch
+  - platform: gpio
     name: "Aanraakknop"
-    pin: GPIO2
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLDOWN
     threshold: 1000
     entity_category: diagnostic
     on_multi_click:
@@ -180,9 +173,9 @@ binary_sensor:
           - light.toggle: led
 
       - timing:
-          - ON for 50ms to 250ms
-          - OFF for 50ms to 200ms
-          - ON for 50ms to 250ms
+          - ON for 40ms to 400ms
+          - OFF for 40ms to 350ms
+          - ON for 40ms to 400ms
           - OFF for at least 300ms
         then:
           - logger.log: "Double press detected"
@@ -192,50 +185,6 @@ binary_sensor:
           - lambda: |-
               id(double_press_detected) = false;
 
-      - timing:
-          - ON for 50ms to 250ms
-          - OFF for 50ms to 200ms
-          - ON for 50ms to 250ms
-          - OFF for 50ms to 200ms
-          - ON for 50ms to 250ms
-          - OFF for at least 300ms
-        then:
-          - logger.log: "Triple press detected"
-          - lambda: |-
-              std::string current = id(led).get_effect_name();
-
-              if (current != "Bliksemflits") {
-                if (!current.empty()) {
-                  id(previous_led_effect) = current;
-                } else {
-                  id(previous_led_effect) = "";
-                }
-
-                auto call = id(led).turn_on();
-                call.set_effect("Bliksemflits");
-                call.perform();
-              } else {
-                if (!id(previous_led_effect).empty()) {
-                  auto call = id(led).turn_on();
-                  call.set_effect(id(previous_led_effect).c_str());
-                  call.perform();
-                } else {
-                  id(led).turn_off();
-                }
-              }
-
-      - timing:
-          - ON for at least 2s
-          - OFF for 200ms to 2s
-          - ON for at least 2s
-        then:
-          - logger.log: "Long double press detected"
-          - lambda: |-
-              id(long_double_press_detected) = true;
-          - delay: 500ms
-          - lambda: |-
-              id(long_double_press_detected) = false;
-
   - platform: status
     name: "Systeemstatus"
     id: system_status
@@ -244,11 +193,6 @@ binary_sensor:
     name: "Dubbele druk gedetecteerd"
     lambda: |-
       return id(double_press_detected);
-
-  - platform: template
-    name: "Lange dubbele druk gedetecteerd"
-    lambda: |-
-      return id(long_double_press_detected);
 
 sensor:
   - platform: internal_temperature
