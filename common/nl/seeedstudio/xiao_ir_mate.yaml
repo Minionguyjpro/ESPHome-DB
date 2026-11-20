@@ -48,6 +48,7 @@ switch:
   - platform: template
     id: relay
     internal: true
+    optimistic: true
 
 light:
   - platform: esp32_rmt_led_strip
