@@ -1,3 +1,6 @@
+substitutions:
+  has_relay: "false"
+
 packages:
   common: !include ../base.yaml
 
@@ -101,19 +104,13 @@ button:
     entity_category: diagnostic
     on_press:
       then:
-        - lambda: |-
-            #ifdef USE_SWITCH
-              if (id(relay) != nullptr) {
-                id(relay)->turn_off();
-              }
-            #endif
-        - delay: 2s
-        - lambda: |-
-            #ifdef USE_SWITCH
-              if (id(relay) != nullptr) {
-                id(relay)->turn_on();
-              }
-            #endif
+        - if:
+            condition:
+              lambda: 'return ${has_relay};'
+            then:
+              - switch.turn_off: relay
+              - delay: 2s
+              - switch.turn_on: relay
 
   - platform: safe_mode
     name: "Herstarten (veilige modus)"
