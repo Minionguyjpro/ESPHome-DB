@@ -164,7 +164,6 @@ binary_sensor:
     pin:
       number: GPIO5
       mode: INPUT_PULLDOWN
-    threshold: 1000
     entity_category: diagnostic
     on_multi_click:
       - timing:
