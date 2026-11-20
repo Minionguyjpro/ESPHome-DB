@@ -8,7 +8,7 @@ remote_receiver:
     number: ${ir_rx_pin}
     inverted: true
   tolerance: 25%
-  idle: 50ms
+  idle: 30ms
   rmt_symbols: 96
 
 remote_transmitter:
