@@ -44,6 +44,11 @@ globals:
     restore_value: false
     initial_value: '""'
 
+switch:
+  - platform: template
+    id: relay
+    internal: true
+
 light:
   - platform: esp32_rmt_led_strip
     id: led
