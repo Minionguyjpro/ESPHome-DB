@@ -4,6 +4,7 @@ substitutions:
     - switch.turn_off: relay
     - delay: 2s
     - switch.turn_on: relay
+  has_relay: "true"
 
 packages:
   common: !include ../generic.yaml
