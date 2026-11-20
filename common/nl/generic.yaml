@@ -101,9 +101,19 @@ button:
     entity_category: diagnostic
     on_press:
       then:
-        - switch.turn_off: relay
+        - lambda: |-
+            #ifdef USE_SWITCH
+              if (id(relay) != nullptr) {
+                id(relay)->turn_off();
+              }
+            #endif
         - delay: 2s
-        - switch.turn_on: relay
+        - lambda: |-
+            #ifdef USE_SWITCH
+              if (id(relay) != nullptr) {
+                id(relay)->turn_on();
+              }
+            #endif
 
   - platform: safe_mode
     name: "Herstarten (veilige modus)"
