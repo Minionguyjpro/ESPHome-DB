@@ -18,7 +18,7 @@ remote_receiver:
     tolerance: 25%
     idle: 30ms
     rmt_symbols: 48
-    on_receive:
+    on_raw:
       - script.execute: blink_ir_led
 
 remote_transmitter:
