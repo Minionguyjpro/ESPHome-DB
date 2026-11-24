@@ -4,7 +4,7 @@ substitutions:
 
 packages:
   common: !include ../generic.yaml
-  espectre: !include ../espectre.yaml
+  #espectre: !include ../espectre.yaml
   infrared: !include
     file: ../infrared.yaml
     vars:
