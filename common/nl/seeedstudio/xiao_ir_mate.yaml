@@ -4,6 +4,7 @@ substitutions:
 
 packages:
   common: !include ../generic.yaml
+  bluetooth: !include ../../esp32/bluetooth.yaml
   #espectre: !include ../espectre.yaml
   infrared: !include
     file: ../infrared.yaml
