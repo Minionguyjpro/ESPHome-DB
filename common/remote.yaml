@@ -2,17 +2,29 @@ substitutions:
   ir_rx_pin: ""
   ir_tx_pin: ""
 
+script:
+  - id: blink_ir_led
+    mode: restart
+    then:
+      - output.turn_on: led
+      - delay: 100ms
+      - output.turn_off: led
+
 remote_receiver:
-  id: ir_rx
-  pin:
-    number: ${ir_rx_pin}
-    inverted: true
-  tolerance: 25%
-  idle: 30ms
-  rmt_symbols: 48
+  - id: ir_rx
+    pin:
+      number: ${ir_rx_pin}
+      inverted: true
+    tolerance: 25%
+    idle: 30ms
+    rmt_symbols: 48
+    on_receive:
+      - script.execute: blink_ir_led
 
 remote_transmitter:
   - id: ir_tx
     pin: ${ir_tx_pin}
     carrier_duty_percent: 50%
     rmt_symbols: 48
+    on_transmit:
+    - script.execute: blink_ir_led
