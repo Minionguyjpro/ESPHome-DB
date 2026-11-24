@@ -6,9 +6,14 @@ script:
   - id: blink_ir_led
     mode: restart
     then:
-      - light.turn_on: led
-      - delay: 100ms
-      - light.turn_off: led
+      - light.turn_on:
+          id: led
+          brightness: 100%
+          transition_length: 0s
+      - delay: 50ms
+      - light.turn_off:
+          id: led
+          transition_length: 0s
 
 remote_receiver:
   - id: ir_rx
@@ -27,4 +32,13 @@ remote_transmitter:
     carrier_duty_percent: 50%
     rmt_symbols: 48
     on_transmit:
-    - script.execute: blink_ir_led
+      then:
+        - light.turn_on:
+            id: led
+            brightness: 100%
+            transition_length: 0s
+    on_complete:
+      then:
+        - light.turn_off:
+            id: led
+            transition_length: 0s
