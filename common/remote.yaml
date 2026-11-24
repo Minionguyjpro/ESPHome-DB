@@ -6,9 +6,9 @@ script:
   - id: blink_ir_led
     mode: restart
     then:
-      - output.turn_on: led
+      - light.turn_on: led
       - delay: 100ms
-      - output.turn_off: led
+      - light.turn_off: led
 
 remote_receiver:
   - id: ir_rx
