@@ -1,3 +1,11 @@
+substitutions:
+  active: false
+
 esp32_ble_tracker:
+  scan_parameters:
+    active: ${active}
+    interval: 320ms
+    window: 30ms
 
 bluetooth_proxy:
+  active: ${active}
