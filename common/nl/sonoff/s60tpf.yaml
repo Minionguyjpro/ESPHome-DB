@@ -72,6 +72,55 @@ light:
       number: GPIO5
       inverted: true
     name: "Blauwe LED"
+    effects:
+      - pulse:
+          name: "Puls"
+      - pulse:
+          name: "Snelle puls"
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Langzame puls"
+          transition_length: 500ms
+          update_interval: 2s
+      - pulse:
+          name: "Asymmetrische puls"
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s
+      - lambda:
+          name: "Slaapmodus"
+          update_interval: 50ms
+          lambda: |-
+            static float brightness = 0.05;
+            static int direction = 1;
+            id(led).set_level(brightness);
+            brightness += direction * 0.002;
+            if (brightness >= 0.3) direction = -1;
+            if (brightness <= 0.05) direction = 1;
+      - lambda:
+          name: "Bliksemflits"
+          update_interval: 10ms
+          lambda: |-
+            static float brightness = 0.0;
+            if (random_float() < 0.02) brightness = 1.0;  // Random flash
+            brightness *= 0.9;  // Fade out
+            id(led).set_level(brightness);
+      - lambda:
+          name: "Waarschuwing"
+          update_interval: 100ms
+          lambda: |-
+            static bool state = false;
+            state = !state;
+
+            if (state) {
+              id(led).set_level(1.0);
+            } else {
+              id(led).set_level(0.0);
+            }
 
 number:
   - platform: template
