@@ -234,8 +234,6 @@ binary_sensor:
       inverted: true
     name: "Aan-uitknop"
     entity_category: diagnostic
-    on_press:
-      switch.toggle: relay
     on_multi_click:
       - timing:
           - ON for 30ms to 300ms
