@@ -5,7 +5,7 @@ substitutions:
     - delay: 2s
     - switch.turn_on: relay
   has_relay: "true"
-  restore_mode: RESTORE_DEFAULT_OFF
+  restore_mode: RESTORE_AND_DEFAULT_OFF
 
 packages:
   common: !include ../generic.yaml
