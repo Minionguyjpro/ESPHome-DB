@@ -67,7 +67,7 @@ globals:
 
 light:
   - platform: status_led
-    id: blue_led_output
+    id: led
     pin:
       number: GPIO5
       inverted: true
