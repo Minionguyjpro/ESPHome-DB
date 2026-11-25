@@ -5,13 +5,27 @@ substitutions:
     - delay: 2s
     - switch.turn_on: relay
   has_relay: "true"
+  restore_mode: RESTORE_DEFAULT_OFF
 
 packages:
   common: !include ../generic.yaml
+  bluetooth: !include ../../esp32/bluetooth.yaml
 
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
+  on_boot:
+    priority: -50
+    then:
+      - lambda: |-
+          if (id(boot_mode_value) == "Aan") {
+           id(relay).turn_on();
+          } else if (id(boot_mode_value) == "Uit") {
+            id(relay).turn_off();
+          }
+          // "Laatste status onthouden" → do nothing, ESPHome restores last state automatically
+      - lambda: |-
+          id(boot_mode).publish_state(id(boot_mode_value));
 
 esp32:
   variant: esp32c3
@@ -21,6 +35,16 @@ esp32:
 logger:
 
 globals:
+  - id: boot_mode_value
+    type: std::string
+    restore_value: true
+    initial_value: '"Laatste status onthouden"'
+
+  - id: saved_state_value
+    type: std::string
+    restore_value: true
+    initial_value: '"Uit"'
+
   - id: double_press_detected
     type: bool
     restore_value: false
@@ -101,15 +125,33 @@ interval:
                 id: led
                 effect: "Waarschuwing"
 
+select:
+  - platform: template
+    id: boot_mode
+    name: "Opstartgedrag"
+    icon: mdi:power-settings
+    entity_category: config
+    restore_value: true
+    optimistic: true
+    options:
+      - "Laatste status onthouden"
+      - "Aan"
+      - "Uit"
+    set_action:
+      - lambda: |-
+          ESP_LOGI("boot_mode", "Boot mode changed to: %s", x.c_str());
+          id(boot_mode_value) = x;
+
 switch:
   - platform: gpio
     pin: GPIO4
     id: relay
     name: None
-    restore_mode: RESTORE_DEFAULT_ON
+    restore_mode: ${restore_mode}
     on_turn_on:
       then:
         - lambda: |-
+            id(saved_state_value) = "Aan";
             id(overcurrent_alert) = false;
 
             if (!id(previous_led_effect).empty()) {
@@ -119,6 +161,10 @@ switch:
             } else {
               id(led).turn_on();
             }
+    on_turn_off:
+      then:
+        - lambda: |-
+            id(saved_state_value) = "Uit";
 
 uart:
   rx_pin: GPIO7
@@ -133,6 +179,8 @@ binary_sensor:
       inverted: true
     name: "Aan-uitknop"
     entity_category: diagnostic
+    on_press:
+      switch.toggle: relay
     on_multi_click:
       - timing:
           - ON for 30ms to 300ms
