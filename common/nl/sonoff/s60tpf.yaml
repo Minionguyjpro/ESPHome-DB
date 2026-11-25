@@ -69,9 +69,6 @@ light:
   - platform: monochromatic
     id: led
     output: blue_led_pwm
-    pin:
-      number: GPIO5
-      inverted: true
     effects:
       - pulse:
           name: "Puls"
