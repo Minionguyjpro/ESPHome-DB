@@ -66,12 +66,12 @@ globals:
     initial_value: '""'
 
 light:
-  - platform: status_led
+  - platform: monochromatic
     id: led
+    output: blue_led_pwm
     pin:
       number: GPIO5
       inverted: true
-    name: "Blauwe LED"
     effects:
       - pulse:
           name: "Puls"
@@ -121,6 +121,15 @@ light:
             } else {
               id(led).set_level(0.0);
             }
+    name: "Blauwe LED"
+    icon: mdi:led-on
+
+output:
+  - platform: ledc
+    pin:
+      number: GPIO5
+      inverted: true
+    id: blue_led_pwm
 
 number:
   - platform: template
